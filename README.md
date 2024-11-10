@@ -1,1 +1,1 @@
-This our software engineering project. This system is about Event management system of wesmaarrdec
+this file is for redefense of our software engineering subject
