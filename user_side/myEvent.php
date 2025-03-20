@@ -348,7 +348,7 @@ if (isset($_SESSION['error'])) {
                         <form action="" method="post" class="flex-btn" id="cancelEventBtn">
                             <input type="hidden" name="event_id" value="<?php echo $eventId; ?>">
                             <input type="hidden" name="event_cancel_reason" value="">
-                            <button type="submit" name="cancel_event" class="btn" onclick="confirmCancelEvent(event)">
+                            <button type="submit" name="cancel_event" class="btn cancel" onclick="confirmCancelEvent(event)">
                                 Cancel Event
                             </button>
                         </form>

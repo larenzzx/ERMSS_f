@@ -76,7 +76,7 @@
 
 html{
     font-size: 62.5%;
-    overflow-x: hidden;
+    overflow-x: auto;
     scroll-padding-top: 7rem;
     scroll-behavior: smooth;
 }
@@ -196,7 +196,7 @@ section{
     display: inline-flex;
     align-items: center;
     padding: 10px 20px;
-    background-color: var(--first-color);
+    background-color: var(--first-color-alt);
     color: #fff;
     text-decoration: none;
     font-weight: bold;
@@ -601,7 +601,7 @@ section{
     cursor: pointer;
     font-size: 1.8rem;
     color: var(--body-color);
-    background-color: var(--first-color);
+    background-color: var(--first-color-alt);
     border-radius: .5rem;
     text-transform: capitalize;
     text-align: center;
@@ -896,6 +896,7 @@ section{
     background: var(--body-color);
     box-shadow: var(--box-shadow);
     margin-bottom: 6rem;
+    overflow: auto;
 }
 
 .event-table h2{
@@ -1170,11 +1171,11 @@ section{
 
 .event-details .details .save i{
     margin-right: .5rem;
-    color: var(--first-color);
+    color: var(--first-color-alt);
 }
 
 .event-details .details .save span{
-    color: var(--first-color);
+    color: var(--first-color-alt);
 }
 
 .event-details .details .save:hover{
@@ -1407,7 +1408,7 @@ section{
     padding: 8px 10px;
     font-size: 15px;
     border: 0;
-    background-color: var(--first-color);
+    background-color: var(--first-color-alt);
     color: var(--body-color);
     cursor: pointer;
     border-radius: 3px;
@@ -1417,6 +1418,7 @@ section{
 .wrapper form .input_field .createBtn.cancel{
     width: 50%;
     margin-left: 1rem;
+    background-color: var(--first-color);
 }
 
 

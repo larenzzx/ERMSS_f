@@ -7,11 +7,16 @@ $yearQuery = "SELECT DISTINCT YEAR(date_start) AS event_year FROM Events ORDER B
 $yearResult = mysqli_query($conn, $yearQuery);
 $years = mysqli_fetch_all($yearResult, MYSQLI_ASSOC);
 
-
-// Fetch total events
-$totalEventsQuery = "SELECT COUNT(*) AS totalEvents FROM Events";
+// Fetch total events excluding cancelled events (where event_cancel or cancelReason is not empty)
+$totalEventsQuery = "
+    SELECT COUNT(*) AS totalEvents 
+    FROM events 
+    WHERE (event_cancel IS NULL OR event_cancel = '') 
+    AND (cancelReason IS NULL OR cancelReason = '')
+";
 $totalEventsResult = mysqli_query($conn, $totalEventsQuery);
 $totalEvents = mysqli_fetch_assoc($totalEventsResult)['totalEvents'];
+
 
 // Fetch total upcoming events (excluding cancelled events)
 $totalUpcomingQuery = "SELECT COUNT(*) AS totalUpcoming FROM Events WHERE (NOW() < CONCAT(date_start, ' ', time_start)) AND (event_cancel IS NULL OR event_cancel = '')";
@@ -211,7 +216,7 @@ $pendingEventsCount = countPendingEvents($conn);
     <div class="main-content">
 
         <div class="containerr">
-            <h3 class="dashboard apply">EVENT MANAGEMENT</h3>
+            <h3 class="dashboard apply">TOTAL EVENTS</h3>
 
             <section class="category">
 
