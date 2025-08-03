@@ -31,7 +31,3 @@
 - **Backend**: PHP 
 - **Database**: MySQL 
 - **Tools**: Git, GitHub
-
-
-# Start the development server (update depending on your setup)
-npm start
