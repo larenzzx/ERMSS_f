@@ -602,7 +602,8 @@ label {
 /* Category boxes */
 .category .box-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+  /* grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr)); */
+  grid-template-columns: repeat(4, 1fr);
   justify-content: center;
   align-items: flex-start;
   gap: 2rem;
@@ -612,7 +613,7 @@ label {
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
   border: none;
-  padding: 2.5rem;
+  padding: 2rem;
   background: var(--body-color);
   display: flex;
   align-items: center;
@@ -639,10 +640,10 @@ label {
 }
 
 .category .box-container .box i {
-  height: 5rem;
+  height: 4.5rem;
   width: 5rem;
-  line-height: 5rem;
-  font-size: 2rem;
+  line-height: 4.5rem;
+  font-size: 1.8rem;
   color: var(--body-color);
   border-radius: var(--border-radius);
   background: linear-gradient(135deg, #ffd60a 0%, #ffba08 100%);
@@ -651,7 +652,7 @@ label {
 }
 
 .category .box-container .box h3 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   text-transform: capitalize;
   color: #000;
   padding-bottom: 0.5rem;
