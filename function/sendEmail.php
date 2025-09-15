@@ -53,8 +53,8 @@ if (isset($_POST["submitAccept"])) {
             $mail->isSMTP();
             $mail->Host = "smtp.gmail.com";
             $mail->SMTPAuth = true;
-            $mail->Username = 'eventmanagement917@gmail.com';
-            $mail->Password = 'meapvvmlkmiccnjx';
+            $mail->Username = 'nazarethxd4@gmail.com';
+            $mail->Password = 'fdyrlkehfyypsnzw';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
@@ -66,7 +66,7 @@ if (isset($_POST["submitAccept"])) {
                 )
             );
 
-            $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
+            $mail->setFrom('nazarethxd4@gmail.com', 'Event Management System');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
@@ -101,8 +101,8 @@ if (isset($_POST["submitDecline"])) {
         $mail->isSMTP();
         $mail->Host = "smtp.gmail.com";
         $mail->SMTPAuth = true;
-        $mail->Username = 'eventmanagement917@gmail.com';
-        $mail->Password = 'meapvvmlkmiccnjx';
+        $mail->Username = 'nazarethxd4@gmail.com';
+        $mail->Password = 'fdyrlkehfyypsnzw';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
@@ -114,7 +114,7 @@ if (isset($_POST["submitDecline"])) {
             )
         );
 
-        $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
+        $mail->setFrom('nazarethxd4@gmail.com', 'Event Management System');
         $mail->addAddress($email);
         $mail->isHTML(true);
         $mail->Subject = 'Account Declined';

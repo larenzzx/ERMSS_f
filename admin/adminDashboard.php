@@ -426,19 +426,16 @@ if (isset($_GET['download'])) {
                     <div>
                         <select name="selectedYear" id="selectedYear">
                             <?php foreach ($years as $year): ?>
-                                <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?>
-                                </option>
+                                <option value="<?php echo $year['event_year']; ?>"><?php echo $year['event_year']; ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <canvas id="myChart" width="400" height="300"></canvas>
-                        <!--change the size by adjusting the width and height-->
+                        <canvas id="myChart"></canvas>
                     </div>
                 </div>
                 <div class="box">
                     <canvas id="eventsYear"></canvas>
                 </div>
             </div>
-
 
             <div class="graphBox_alt">
                 <?php
@@ -447,13 +444,10 @@ if (isset($_GET['download'])) {
                 ?>
 
                 <div class="event_report_download">
-
-                    <div style="margin-bottom:2rem;">
-
+                    <div>
                         <select id="yearSelect">
                             <option value="" disabled selected>Select Year</option>
                             <?php
-                            // Check if any rows were returned
                             if ($result->num_rows > 0) {
                                 while ($row = $result->fetch_assoc()) {
                                     echo '<option value="' . $row['year'] . '">' . $row['year'] . '</option>';
@@ -464,7 +458,7 @@ if (isset($_GET['download'])) {
 
                         <select id="monthSelect">
                             <option value="" disabled selected>Select Month</option>
-                            <option value="all">All Months</option> <!-- Add this line -->
+                            <option value="all">All Months</option>
                             <option value="01">January</option>
                             <option value="02">February</option>
                             <option value="03">March</option>
@@ -478,15 +472,12 @@ if (isset($_GET['download'])) {
                             <option value="11">November</option>
                             <option value="12">December</option>
                         </select>
-
-
                     </div>
 
-                    <button style="margin-left: 4rem;" onclick="downloadReport()" class="download-button">
+                    <button onclick="downloadReport()" class="download-button">
                         <i class='fa fa-print'></i> Download Report
                     </button>
                 </div>
-
             </div>
 
         </div>
@@ -551,11 +542,6 @@ if (isset($_GET['download'])) {
 
 
 
-
-
-
-
-
     <!-- CONFIRM DELETE -->
     <script src=js/deleteEvent.js></script>
 
@@ -573,142 +559,392 @@ if (isset($_GET['download'])) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Existing code for bar chart
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var yearly = document.getElementById('eventsYear').getContext('2d');
-
-            var selectedYear = document.getElementById('selectedYear');
-            var selectedYearValue = selectedYear.value;
-            var myChart; // Declare myChart variable
-
-            selectedYear.addEventListener('change', function () {
-                selectedYearValue = selectedYear.value;
-                updateCharts();
-            });
-
-            function updateCharts() {
-                // Fetch data for the bar chart (per month)
-                fetchBarChartData(selectedYearValue).then(function (data) {
-                    updateBarChart(data);
-                });
-
-                // Fetch data for the line chart (per year)
-                fetchLineChartData().then(function (data) {
-                    updateLineChart(data);
-                });
-            }
-
-            function fetchBarChartData(year) {
-                return fetch('../function/F.getMonthlyEvents.php?year=' + year)
-                    .then(response => response.json())
-                    .then(data => data.events);
-            }
-
-            function updateBarChart(data) {
-                // Remove the existing chart if it exists
-                if (myChart) {
-                    myChart.destroy();
-                }
-
-                // Your existing Chart.js code for the bar chart
-                myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                        datasets: [{
-                            label: '# of events per month',
-                            data: data.map(monthData => monthData.total_events),
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)',
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
+            // Chart instances
+            let barChart = null;
+            let lineChart = null;
+            
+            // Chart contexts
+            const barCtx = document.getElementById('myChart').getContext('2d');
+            const lineCtx = document.getElementById('eventsYear').getContext('2d');
+            const selectedYearElement = document.getElementById('selectedYear');
+            
+            let selectedYearValue = selectedYearElement.value;
+            
+            // Chart.js responsive configuration
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
                     },
-                    options: {
-                        responsive: true,
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            padding: 8
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            padding: 8
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderRadius: 4,
+                        borderSkipped: false
+                    },
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6,
+                        borderWidth: 2
+                    },
+                    line: {
+                        borderWidth: 3,
+                        tension: 0.3
+                    }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeInOutQuart'
+                }
+            };
+            
+            // Enhanced color schemes
+            const barColors = [
+                'rgba(99, 102, 241, 0.8)',   // Indigo
+                'rgba(16, 185, 129, 0.8)',   // Emerald
+                'rgba(245, 158, 11, 0.8)',   // Amber
+                'rgba(239, 68, 68, 0.8)',    // Red
+                'rgba(168, 85, 247, 0.8)',   // Purple
+                'rgba(14, 165, 233, 0.8)',   // Sky
+                'rgba(34, 197, 94, 0.8)',    // Green
+                'rgba(251, 146, 60, 0.8)',   // Orange
+                'rgba(236, 72, 153, 0.8)',   // Pink
+                'rgba(59, 130, 246, 0.8)',   // Blue
+                'rgba(139, 92, 246, 0.8)',   // Violet
+                'rgba(6, 182, 212, 0.8)'     // Cyan
+            ];
+            
+            const barBorderColors = [
+                'rgb(99, 102, 241)',   'rgb(16, 185, 129)',   'rgb(245, 158, 11)',
+                'rgb(239, 68, 68)',    'rgb(168, 85, 247)',   'rgb(14, 165, 233)',
+                'rgb(34, 197, 94)',    'rgb(251, 146, 60)',   'rgb(236, 72, 153)',
+                'rgb(59, 130, 246)',   'rgb(139, 92, 246)',   'rgb(6, 182, 212)'
+            ];
+            
+            // Wrap canvas elements for proper responsiveness
+            function wrapCanvasElements() {
+                const canvases = document.querySelectorAll('.graphBox canvas');
+                canvases.forEach(canvas => {
+                    if (!canvas.parentElement.classList.contains('chart-wrapper')) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'chart-wrapper';
+                        canvas.parentNode.insertBefore(wrapper, canvas);
+                        wrapper.appendChild(canvas);
                     }
                 });
             }
-
-            function fetchLineChartData() {
-                return fetch('../function/F.getYearlyEvents.php')
-                    .then(response => response.json())
+            
+            // Add loading state
+            function showChartLoading(container) {
+                const loadingEl = document.createElement('div');
+                loadingEl.className = 'chart-loading';
+                loadingEl.innerHTML = '<span>Loading chart...</span>';
+                container.appendChild(loadingEl);
+                return loadingEl;
+            }
+            
+            function hideChartLoading(loadingEl) {
+                if (loadingEl && loadingEl.parentNode) {
+                    loadingEl.parentNode.removeChild(loadingEl);
+                }
+            }
+            
+            // Year selector change handler
+            selectedYearElement.addEventListener('change', function () {
+                selectedYearValue = selectedYearElement.value;
+                updateCharts();
+            });
+            
+            // Resize observer for responsive handling
+            const resizeObserver = new ResizeObserver((entries) => {
+                entries.forEach(entry => {
+                    // Delay chart resize to allow container to fully adjust
+                    setTimeout(() => {
+                        if (barChart) barChart.resize();
+                        if (lineChart) lineChart.resize();
+                    }, 100);
+                });
+            });
+            
+            // Observe chart containers
+            const graphBoxes = document.querySelectorAll('.graphBox .box');
+            graphBoxes.forEach(box => resizeObserver.observe(box));
+            
+            // Chart update functions
+            function updateCharts() {
+                const barContainer = barCtx.canvas.parentElement;
+                const lineContainer = lineCtx.canvas.parentElement;
+                
+                const barLoading = showChartLoading(barContainer);
+                const lineLoading = showChartLoading(lineContainer);
+                
+                // Fetch data for both charts
+                Promise.all([
+                    fetchBarChartData(selectedYearValue),
+                    fetchLineChartData()
+                ]).then(([barData, lineData]) => {
+                    updateBarChart(barData);
+                    updateLineChart(lineData);
+                    
+                    hideChartLoading(barLoading);
+                    hideChartLoading(lineLoading);
+                }).catch(error => {
+                    console.error('Error updating charts:', error);
+                    hideChartLoading(barLoading);
+                    hideChartLoading(lineLoading);
+                });
+            }
+            
+            function fetchBarChartData(year) {
+                return fetch('../function/F.getMonthlyEvents.php?year=' + year)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
                     .then(data => data.events);
             }
-
+            
+            function fetchLineChartData() {
+                return fetch('../function/F.getYearlyEvents.php')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => data.events);
+            }
+            
+            function updateBarChart(data) {
+                if (barChart) {
+                    barChart.destroy();
+                }
+                
+                barChart = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            'January', 'February', 'March', 'April', 
+                            'May', 'June', 'July', 'August', 
+                            'September', 'October', 'November', 'December'
+                        ],
+                        datasets: [{
+                            label: `Events in ${selectedYearValue}`,
+                            data: data.map(monthData => monthData.total_events),
+                            backgroundColor: barColors,
+                            borderColor: barBorderColors,
+                            borderWidth: 2,
+                            borderRadius: 4,
+                            borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: {
+                            ...chartOptions.plugins,
+                            title: {
+                                display: true,
+                                text: `Monthly Events Distribution - ${selectedYearValue}`,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                padding: {
+                                    top: 10,
+                                    bottom: 30
+                                }
+                            }
+                        },
+                        scales: {
+                            ...chartOptions.scales,
+                            y: {
+                                ...chartOptions.scales.y,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Events',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            x: {
+                                ...chartOptions.scales.x,
+                                title: {
+                                    display: true,
+                                    text: 'Months',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
             function updateLineChart(data) {
-                // Your existing Chart.js code for the line chart
-                var myChart = new Chart(yearly, {
+                if (lineChart) {
+                    lineChart.destroy();
+                }
+                
+                lineChart = new Chart(lineCtx, {
                     type: 'line',
                     data: {
                         labels: data.map(yearData => yearData.year),
                         datasets: [{
-                            label: 'Total # of events per year',
+                            label: 'Total Events per Year',
                             data: data.map(yearData => yearData.total_events),
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)',
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            borderColor: 'rgb(99, 102, 241)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: 'rgb(99, 102, 241)',
+                            pointBorderColor: 'white',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
                         }]
                     },
                     options: {
-                        responsive: true,
+                        ...chartOptions,
+                        plugins: {
+                            ...chartOptions.plugins,
+                            title: {
+                                display: true,
+                                text: 'Yearly Events Trend',
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                padding: {
+                                    top: 10,
+                                    bottom: 30
+                                }
+                            }
+                        },
+                        scales: {
+                            ...chartOptions.scales,
+                            y: {
+                                ...chartOptions.scales.y,
+                                title: {
+                                    display: true,
+                                    text: 'Total Events',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            x: {
+                                ...chartOptions.scales.x,
+                                title: {
+                                    display: true,
+                                    text: 'Years',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
             }
-
-            // Initial update on page load
-            updateCharts();
+            
+            // Handle sidebar toggle effects
+            function handleSidebarToggle() {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    const observer = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                                // Delay chart resize to allow sidebar animation to complete
+                                setTimeout(() => {
+                                    if (barChart) barChart.resize();
+                                    if (lineChart) lineChart.resize();
+                                }, 350); // Match sidebar transition duration
+                            }
+                        });
+                    });
+                    
+                    observer.observe(sidebar, {
+                        attributes: true,
+                        attributeFilter: ['class']
+                    });
+                }
+            }
+            
+            // Initialize everything
+            function initialize() {
+                wrapCanvasElements();
+                handleSidebarToggle();
+                updateCharts();
+            }
+            
+            // Start initialization
+            initialize();
+            
+            // Handle window resize with debouncing
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (barChart) barChart.resize();
+                    if (lineChart) lineChart.resize();
+                }, 150);
+            });
         });
 
     </script>

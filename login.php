@@ -23,7 +23,7 @@ require_once('db.connection/connection.php');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.1.0/remixicon.css" />
 
 
-    <title>Sign-in & Sign-up | Event Record Management</title>
+    <title>Sign-in & Sign-up | Event Management System</title>
 </head>
 
 

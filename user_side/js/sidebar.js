@@ -3,7 +3,7 @@ let sidebar = document.querySelector('.sidebar');
 let sidebarToggleIcons = document.querySelectorAll('.events-side .a-events, .events-side2 .a-events');
 
 // Make the sidebar open by default when the page loads
-sidebar.classList.add('active');
+sidebar.classList.remove('active');
 
 // Add the toggle functionality to the button
 btnn.onclick = function () {
