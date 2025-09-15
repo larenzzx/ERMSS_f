@@ -31,3 +31,11 @@
 - **Backend**: PHP 
 - **Database**: MySQL 
 - **Tools**: Git, GitHub
+
+- ## ACCOUNTS
+
+email:Admin@gmail.com
+password:Tabotabo
+
+email: superadmin@gmail.com
+password: 123
