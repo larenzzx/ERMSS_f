@@ -233,8 +233,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'eventmanagement917@gmail.com';  // Your email
-            $mail->Password = 'meapvvmlkmiccnjx';  // Your app password
+            $mail->Username = 'nazarethxd4@gmail.com';  // Your email
+            $mail->Password = 'fdyrlkehfyypsnzw';  // Your app password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
     
@@ -246,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 )
             );
     
-            $mail->setFrom('eventmanagement917@gmail.com', 'Event Management System');
+            $mail->setFrom('nazarethxd4@gmail.com', 'Event Management System');
             $mail->addAddress($Email);  // Send email to the user's email
     
             $mail->isHTML(true);
